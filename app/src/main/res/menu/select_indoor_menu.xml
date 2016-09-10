@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:daohang="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/select_indoor"
+        android:icon="@mipmap/ic_search_white"
+        android:title="搜索"
+        daohang:showAsAction="ifRoom" />
+</menu>

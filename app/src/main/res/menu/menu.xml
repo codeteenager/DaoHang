@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:daohang="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/current_city"
+        android:title="城市"
+        daohang:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/map_normal"
+        android:title="普通地图"
+        daohang:showAsAction="never" />
+    <item
+        android:id="@+id/map_satellite"
+        android:title="卫星地图"
+        daohang:showAsAction="never" />
+    <item
+        android:id="@+id/map_traffic"
+        android:title="交通图"
+        daohang:showAsAction="never" />
+</menu>
