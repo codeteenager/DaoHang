@@ -11,6 +11,8 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.CircleOptions;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.OverlayOptions;
@@ -48,6 +50,9 @@ public class PoiSearchActivity extends BaseActivity implements
         mBaiduMap = mapView.getMap();
         double latitude = Double.parseDouble(CommonUtils.getSpStr(getApplicationContext(), "currentLatitude", ""));
         double longitude = Double.parseDouble(CommonUtils.getSpStr(getApplicationContext(), "currentLongitude", ""));
+        LatLng latlng = new LatLng(latitude, longitude);
+        MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
+        mBaiduMap.animateMapStatus(msu);
         center = new LatLng(latitude, longitude);
         // 初始化搜索模块，注册搜索事件监听
         mPoiSearch = PoiSearch.newInstance();

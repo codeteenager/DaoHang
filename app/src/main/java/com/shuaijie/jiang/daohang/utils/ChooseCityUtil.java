@@ -18,7 +18,6 @@ import com.shuaijie.jiang.daohang.bean.CityBean;
 import com.shuaijie.jiang.daohang.bean.CityData;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChooseCityUtil implements View.OnClickListener, NumberPicker.OnValueChangeListener {

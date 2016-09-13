@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.CityInfo;
@@ -43,6 +46,11 @@ public class PanoActivity extends BaseActivity implements
         // 初始化搜索模块，注册搜索事件监听
         mPoiSearch = PoiSearch.newInstance();
         mPoiSearch.setOnGetPoiSearchResultListener(this);
+        String latitude = CommonUtils.getSpStr(getApplicationContext(), "currentLatitude", null);
+        String longitude = CommonUtils.getSpStr(getApplicationContext(), "currentLongitude", null);
+        LatLng latlng = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+        MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
+        mBaiduMap.animateMapStatus(msu);
     }
 
     /**

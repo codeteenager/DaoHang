@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private boolean isFirstLocate = true;
     private MyOrientationListener listener;
     private float currentX;
+    private String currentCity, currentProvince, currentDistrict, actionbarCity, actionbarProvince, actionbarDistrict;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +187,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 LatLng latlng = new LatLng(latitude, longitude);
                 MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
                 mBaiduMap.animateMapStatus(msu);
+                cityItem.setTitle(currentCity + "市");
+                actionbarProvince = currentProvince;
+                actionbarCity = currentCity;
+                actionbarDistrict = currentDistrict;
             }
         });
     }
@@ -285,15 +290,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             latitude = location.getLatitude();
             longitude = location.getLongitude();
-            System.out.println("经度" + latitude);
-            System.out.println("纬度" + longitude);
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
                     .direction(currentX).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
+            currentCity = subCityProvince(location.getCity());
+            currentProvince = subCityProvince(location.getProvince());
+            currentDistrict = subCityProvince(location.getDistrict());
             if (isFirstLocate) {
+                actionbarCity = subCityProvince(location.getCity());
+                actionbarProvince = subCityProvince(location.getProvince());
+                actionbarDistrict = subCityProvince(location.getDistrict());
                 LatLng latlng = new LatLng(latitude, longitude);
                 MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
                 mBaiduMap.animateMapStatus(msu);
@@ -369,7 +378,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         switch (item.getItemId()) {
             case R.id.current_city:
                 ChooseCityUtil cityUtil = new ChooseCityUtil();
-                String[] oldCityArray = {"广东", "深圳", ""};
+                String[] oldCityArray = {actionbarProvince, actionbarCity, actionbarDistrict};
                 cityUtil.createDialog(this, oldCityArray, new ChooseCityInterface() {
                     @Override
                     public void sure(String[] newCityArray) {
@@ -377,6 +386,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         //cityItem.setTitle(newCityArray[0] + "-" + newCityArray[1] + "-" + newCityArray[2]);
                         cityItem.setTitle(newCityArray[1] + "市");
                         geoCoder.geocode(new GeoCodeOption().city(newCityArray[1]).address(newCityArray[2]));
+                        actionbarProvince = newCityArray[0];
+                        actionbarCity = newCityArray[1];
+                        actionbarDistrict = newCityArray[2];
                         Toast.makeText(getApplicationContext(), "切换到" + newCityArray[0] + "省" + newCityArray[1] + "市" + newCityArray[2] + "县", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -397,6 +409,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         //优先返回抽屉按钮事件处理
         return drawerToggle.onOptionsItemSelected(item) | super.onOptionsItemSelected(item);
+    }
+
+    private String subCityProvince(String str) {
+        return str.substring(0, str.length() - 1);
     }
 
     //创建选项菜单
