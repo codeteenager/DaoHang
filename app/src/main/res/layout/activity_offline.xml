@@ -1,63 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/city_list"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tl_offline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@color/white"
+        app:tabIndicatorColor="@color/colorPrimary"
+        app:tabSelectedTextColor="@color/colorPrimary"
+        app:tabTextColor="@color/black" />
 
-        <Button
-            android:id="@+id/clButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/btn_bg"
-            android:onClick="clickCityListButton"
-            android:text="城市列表"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/localButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/btn_bg"
-            android:onClick="clickLocalMapListButton"
-            android:text="下载管理"
-            android:textColor="@color/white" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/citylist_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ListView
-            android:id="@+id/allcitylist"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@color/colorPrimary"
-            android:dividerHeight="1dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/localmap_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ListView
-            android:id="@+id/localmaplist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@color/colorPrimary"
-            android:dividerHeight="1dp" />
-    </LinearLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_offline"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>

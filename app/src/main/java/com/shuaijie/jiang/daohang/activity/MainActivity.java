@@ -285,6 +285,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             latitude = location.getLatitude();
             longitude = location.getLongitude();
+            System.out.println("经度" + latitude);
+            System.out.println("纬度" + longitude);
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360

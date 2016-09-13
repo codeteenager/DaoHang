@@ -24,7 +24,7 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <com.shuaijie.jiang.daohang.view.CricleImageView
+            <com.shuaijie.jiang.daohang.view.CircleImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@mipmap/ic_launcher" />
