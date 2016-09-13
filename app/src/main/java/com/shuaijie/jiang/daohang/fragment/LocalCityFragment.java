@@ -29,8 +29,6 @@ public class LocalCityFragment extends Fragment implements MKOfflineMapListener 
     /**
      * 已下载的离线地图信息列表
      */
-
-
     private ArrayList<MKOLUpdateElement> localMapList = null;
     private LocalMapAdapter lAdapter = null;
 
