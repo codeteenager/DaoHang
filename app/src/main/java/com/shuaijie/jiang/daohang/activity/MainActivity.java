@@ -1,14 +1,18 @@
 package com.shuaijie.jiang.daohang.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Point;
+import android.media.audiofx.BassBoost;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +20,7 @@ import android.view.ViewConfiguration;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -51,7 +56,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private MenuItem cityItem;
@@ -70,6 +75,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private MyOrientationListener listener;
     private float currentX;
     private String currentCity, currentProvince, currentDistrict, actionbarCity, actionbarProvince, actionbarDistrict;
+    private updateNetworkReceiver updateNetworkReceiver;
+    private TextView tv_tip_network;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +86,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setMapCustomFile(this, type);
         makeActionOverflowMenuShown();
         setContentView(R.layout.activity_main);
-        initActionBar();
+        initView();
         initBaiduMap();
     }
 
@@ -138,11 +145,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         });
     }
 
-    private void initActionBar() {
+    private void initView() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
+        tv_tip_network = (TextView) findViewById(R.id.tv_tip_network);
         lvMenu = (ListView) findViewById(R.id.lv_menu);
         lvMenu.setAdapter(new MenuAdapter(this));
         lvMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -165,6 +173,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         btnNearby.setOnClickListener(this);
         btnRoute.setOnClickListener(this);
         btnNavi.setOnClickListener(this);
+        tv_tip_network.setOnClickListener(this);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer, R.string.close_drawer) {
 
@@ -184,15 +193,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LatLng latlng = new LatLng(latitude, longitude);
-                MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
-                mBaiduMap.animateMapStatus(msu);
-                cityItem.setTitle(currentCity + "市");
-                actionbarProvince = currentProvince;
-                actionbarCity = currentCity;
-                actionbarDistrict = currentDistrict;
+                if (latitude != 0.0 && longitude != 0.0) {
+                    LatLng latlng = new LatLng(latitude, longitude);
+                    MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
+                    mBaiduMap.animateMapStatus(msu);
+                }
+                if (currentCity != null) {
+                    cityItem.setTitle(currentCity + "市");
+                    actionbarProvince = currentProvince;
+                    actionbarCity = currentCity;
+                    actionbarDistrict = currentDistrict;
+                }
             }
         });
+        updateNetworkReceiver = new updateNetworkReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.intent.action.network");
+        registerReceiver(updateNetworkReceiver, intentFilter);
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.isNetworkConnected");
+        sendBroadcast(intent);
     }
 
     // 设置个性化地图config文件路径
@@ -262,6 +282,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             case R.id.btn_navi:
                 startActivity(new Intent(MainActivity.this, NaviActivity.class));
                 break;
+            case R.id.tv_tip_network:
+                Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                startActivity(intent);
+                break;
         }
     }
 
@@ -287,35 +311,40 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-            MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
-                    // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(currentX).latitude(location.getLatitude())
-                    .longitude(location.getLongitude()).build();
-            mBaiduMap.setMyLocationData(locData);
-            currentCity = subCityProvince(location.getCity());
-            currentProvince = subCityProvince(location.getProvince());
-            currentDistrict = subCityProvince(location.getDistrict());
-            if (isFirstLocate) {
-                actionbarCity = subCityProvince(location.getCity());
-                actionbarProvince = subCityProvince(location.getProvince());
-                actionbarDistrict = subCityProvince(location.getDistrict());
-                LatLng latlng = new LatLng(latitude, longitude);
-                MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
-                mBaiduMap.animateMapStatus(msu);
-                isFirstLocate = false;
-                cityItem.setTitle(location.getCity());
-                Toast.makeText(getApplicationContext(), "当前位置" + location.getAddrStr(), Toast.LENGTH_SHORT).show();
-            }
-            String currentCity = location.getCity();
-            CommonUtils.setSpStr(getApplicationContext(), "currentCity", currentCity);
-            CommonUtils.setSpStr(getApplicationContext(), "currentLatitude", latitude + "");
-            CommonUtils.setSpStr(getApplicationContext(), "currentLongitude", longitude + "");
+//            if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
+//                Toast.makeText(MainActivity.this, "GPS定位成功", Toast.LENGTH_SHORT).show();
+//            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
+//                Toast.makeText(MainActivity.this, "网络定位成功", Toast.LENGTH_SHORT).show();
+//            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
+//                Toast.makeText(MainActivity.this, "离线定位成功", Toast.LENGTH_SHORT).show();
+//            }
+//            latitude = location.getLatitude();
+//            longitude = location.getLongitude();
+//            MyLocationData locData = new MyLocationData.Builder()
+//                    .accuracy(location.getRadius())
+//                    // 此处设置开发者获取到的方向信息，顺时针0-360
+//                    .direction(currentX).latitude(location.getLatitude())
+//                    .longitude(location.getLongitude()).build();
+//            mBaiduMap.setMyLocationData(locData);
+//            currentCity = subCityProvince(location.getCity());
+//            currentProvince = subCityProvince(location.getProvince());
+//            currentDistrict = subCityProvince(location.getDistrict());
+//            if (isFirstLocate) {
+//                actionbarCity = subCityProvince(location.getCity());
+//                actionbarProvince = subCityProvince(location.getProvince());
+//                actionbarDistrict = subCityProvince(location.getDistrict());
+//                LatLng latlng = new LatLng(latitude, longitude);
+//                MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
+//                mBaiduMap.animateMapStatus(msu);
+//                isFirstLocate = false;
+//                cityItem.setTitle(location.getCity());
+//                Toast.makeText(getApplicationContext(), "当前位置" + location.getAddrStr(), Toast.LENGTH_SHORT).show();
+//            }
+//            String currentCity = location.getCity();
+//            CommonUtils.setSpStr(getApplicationContext(), "currentCity", currentCity);
+//            CommonUtils.setSpStr(getApplicationContext(), "currentLatitude", latitude + "");
+//            CommonUtils.setSpStr(getApplicationContext(), "currentLongitude", longitude + "");
         }
-
     }
 
 
@@ -326,6 +355,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         mMapView.onDestroy();
         geoCoder.destroy();
+        unregisterReceiver(updateNetworkReceiver);
     }
 
     @Override
@@ -443,6 +473,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         } catch (Exception e) {
 
+        }
+    }
+
+    public class updateNetworkReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String isShow = intent.getStringExtra("msg");
+            if (isShow.equals("innet")) {
+                tv_tip_network.setVisibility(View.GONE);
+            } else {
+                tv_tip_network.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

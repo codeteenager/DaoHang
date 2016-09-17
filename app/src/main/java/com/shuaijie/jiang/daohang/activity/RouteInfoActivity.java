@@ -1,20 +1,15 @@
 package com.shuaijie.jiang.daohang.activity;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
@@ -54,6 +49,7 @@ public class RouteInfoActivity extends BaseActivity {
                 }
                 sugAdapter = new ArrayAdapter<String>(RouteInfoActivity.this, android.R.layout.simple_dropdown_item_1line, suggestSt);
                 et_st.setAdapter(sugAdapter);
+                et_en.setAdapter(sugAdapter);
                 sugAdapter.notifyDataSetChanged();
             }
         });
@@ -61,6 +57,35 @@ public class RouteInfoActivity extends BaseActivity {
                 android.R.layout.simple_dropdown_item_1line));
         et_st.setThreshold(1);
         et_st.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.length() <= 0) {
+                    return;
+                }
+
+                /**
+                 * 使用建议搜索服务获取建议列表，结果在onSuggestionResult()中更新
+                 */
+                String currentCity = CommonUtils.getSpStr(getApplicationContext(), "currentCity", "");
+                mSuggestionSearch
+                        .requestSuggestion((new SuggestionSearchOption())
+                                .keyword(charSequence.toString()).city(currentCity));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        et_en.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line));
+        et_en.setThreshold(1);
+        et_en.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 

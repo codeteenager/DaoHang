@@ -3,6 +3,7 @@ package com.shuaijie.jiang.daohang.activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -49,44 +50,86 @@ import com.shuaijie.jiang.daohang.utils.CommonUtils;
 
 import java.util.List;
 
-public class RoutePlanActivity extends BaseActivity implements View.OnClickListener, BaiduMap.OnMapClickListener,
+public class RoutePlanActivity extends BaseActivity implements BaiduMap.OnMapClickListener,
         OnGetRoutePlanResultListener {
     private String st;
     private String en;
-    MapView mMapView = null;
+    private MapView mMapView = null;
     private BaiduMap mBaiduMap;
     private RoutePlanSearch mSearch;
-    private Button transit, walking, driving, biking;
     private PlanNode stNode;
     private PlanNode enNode;
     private String currentCity;
     // 浏览路线节点相关
-    Button mBtnPre = null; // 上一个节点
-    Button mBtnNext = null; // 下一个节点
-    RouteLine route = null;
+    private Button mBtnPre = null; // 上一个节点
+    private Button mBtnNext = null; // 下一个节点
+    private RouteLine route = null;
     int nodeIndex = -1; // 节点索引,供浏览节点时使用
-    OverlayManager routeOverlay = null;
+    private OverlayManager routeOverlay = null;
     private TextView popupText = null; // 泡泡view
-    TransitRouteResult nowResult = null;
-    DrivingRouteResult nowResultd = null;
+    private TransitRouteResult nowResult = null;
+    private DrivingRouteResult nowResultd = null;
+    private TabLayout routePlanTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_plan);
         actionBar.setTitle("路径规划");
-        transit = (Button) findViewById(R.id.transit);
-        driving = (Button) findViewById(R.id.driving);
-        walking = (Button) findViewById(R.id.walking);
-        biking = (Button) findViewById(R.id.biking);
+        routePlanTab = (TabLayout) findViewById(R.id.route_plan_tab);
+        final TabLayout.Tab walkingTab = routePlanTab.newTab();
+        walkingTab.setText("步行");
+        final TabLayout.Tab bikingTab = routePlanTab.newTab();
+        bikingTab.setText("骑车");
+        final TabLayout.Tab transitTab = routePlanTab.newTab();
+        transitTab.setText("公交");
+        final TabLayout.Tab drivingTab = routePlanTab.newTab();
+        drivingTab.setText("驾车");
+        routePlanTab.addTab(walkingTab);
+        routePlanTab.addTab(bikingTab);
+        routePlanTab.addTab(transitTab);
+        routePlanTab.addTab(drivingTab);
+        routePlanTab.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mBaiduMap.clear();
+                if (tab == drivingTab) {
+                    mBtnPre.setVisibility(View.INVISIBLE);
+                    mBtnNext.setVisibility(View.INVISIBLE);
+                    mSearch.drivingSearch((new DrivingRoutePlanOption())
+                            .from(stNode).to(enNode));
+                } else if (tab == bikingTab) {
+                    mBtnPre.setVisibility(View.INVISIBLE);
+                    mBtnNext.setVisibility(View.INVISIBLE);
+                    mSearch.bikingSearch((new BikingRoutePlanOption())
+                            .from(stNode).to(enNode));
+                } else if (tab == walkingTab) {
+                    mBtnPre.setVisibility(View.INVISIBLE);
+                    mBtnNext.setVisibility(View.INVISIBLE);
+                    mSearch.walkingSearch((new WalkingRoutePlanOption())
+                            .from(stNode).to(enNode));
+                } else if (tab == transitTab) {
+                    mBtnPre.setVisibility(View.INVISIBLE);
+                    mBtnNext.setVisibility(View.INVISIBLE);
+                    mSearch.transitSearch((new TransitRoutePlanOption())
+                            .from(stNode).city(currentCity).to(enNode));
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
         mBtnPre = (Button) findViewById(R.id.pre);
         mBtnNext = (Button) findViewById(R.id.next);
         mBtnPre.setVisibility(View.INVISIBLE);
         mBtnNext.setVisibility(View.INVISIBLE);
-        transit.setOnClickListener(this);
-        driving.setOnClickListener(this);
-        walking.setOnClickListener(this);
-        biking.setOnClickListener(this);
         mMapView = (MapView) findViewById(R.id.bv_route);
         mBaiduMap = mMapView.getMap();
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
@@ -200,37 +243,6 @@ public class RoutePlanActivity extends BaseActivity implements View.OnClickListe
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
-    }
-
-    @Override
-    public void onClick(View view) {
-        mBaiduMap.clear();
-        switch (view.getId()) {
-            case R.id.driving:
-                mBtnPre.setVisibility(View.INVISIBLE);
-                mBtnNext.setVisibility(View.INVISIBLE);
-                mSearch.drivingSearch((new DrivingRoutePlanOption())
-                        .from(stNode).to(enNode));
-                break;
-            case R.id.walking:
-                mBtnPre.setVisibility(View.INVISIBLE);
-                mBtnNext.setVisibility(View.INVISIBLE);
-                mSearch.walkingSearch((new WalkingRoutePlanOption())
-                        .from(stNode).to(enNode));
-                break;
-            case R.id.transit:
-                mBtnPre.setVisibility(View.INVISIBLE);
-                mBtnNext.setVisibility(View.INVISIBLE);
-                mSearch.transitSearch((new TransitRoutePlanOption())
-                        .from(stNode).city(currentCity).to(enNode));
-                break;
-            case R.id.biking:
-                mBtnPre.setVisibility(View.INVISIBLE);
-                mBtnNext.setVisibility(View.INVISIBLE);
-                mSearch.bikingSearch((new BikingRoutePlanOption())
-                        .from(stNode).to(enNode));
-                break;
-        }
     }
 
     @Override

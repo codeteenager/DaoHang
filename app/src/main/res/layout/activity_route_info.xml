@@ -53,5 +53,5 @@
         android:background="@drawable/btn_bg"
         android:onClick="search"
         android:text="搜索"
-        android:textColor="@color/white" />
+        android:textColor="@drawable/btn_text_bg" />
 </LinearLayout>

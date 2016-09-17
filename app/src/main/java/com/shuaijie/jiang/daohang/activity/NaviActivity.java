@@ -7,9 +7,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.baidu.mapapi.model.LatLng;
@@ -19,6 +22,10 @@ import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
+import com.baidu.mapapi.search.sug.SuggestionResult;
+import com.baidu.mapapi.search.sug.SuggestionSearch;
+import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 import com.baidu.navisdk.adapter.BNOuterTTSPlayerCallback;
 import com.baidu.navisdk.adapter.BNRoutePlanNode;
 import com.baidu.navisdk.adapter.BNaviSettingManager;
@@ -38,10 +45,12 @@ public class NaviActivity extends BaseActivity {
     private final static int authBaseRequestCode = 1;
     private final static String authBaseArr[] =
             {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION};
-    private EditText et_st_navi, et_en_navi;
-    private String stNaviInfo, enNaviInfo;
+    private AutoCompleteTextView et_st_navi, et_en_navi;
     private GeoCoder geoCoder;
     private LatLng enLatlng;
+    private SuggestionSearch mSuggestionSearch = null;
+    private List<String> suggestSt;
+    private ArrayAdapter<String> sugAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +78,90 @@ public class NaviActivity extends BaseActivity {
 
             }
         });
-        et_en_navi = (EditText) findViewById(R.id.et_en_navi);
-        et_st_navi = (EditText) findViewById(R.id.et_st_navi);
+        et_en_navi = (AutoCompleteTextView) findViewById(R.id.et_en_navi);
+        et_st_navi = (AutoCompleteTextView) findViewById(R.id.et_st_navi);
         startNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 geoCoder.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_en_navi.getText().toString().trim()));
+            }
+        });
+        // 初始化建议搜索模块，注册建议搜索事件监听
+        mSuggestionSearch = SuggestionSearch.newInstance();
+        mSuggestionSearch.setOnGetSuggestionResultListener(new OnGetSuggestionResultListener() {
+            @Override
+            public void onGetSuggestionResult(SuggestionResult res) {
+                if (res == null || res.getAllSuggestions() == null) {
+                    return;
+                }
+                suggestSt = new ArrayList<String>();
+                for (SuggestionResult.SuggestionInfo info : res.getAllSuggestions()) {
+                    if (info.key != null) {
+                        suggestSt.add(info.key);
+                    }
+                }
+                sugAdapter = new ArrayAdapter<String>(NaviActivity.this, android.R.layout.simple_dropdown_item_1line, suggestSt);
+                et_st_navi.setAdapter(sugAdapter);
+                et_en_navi.setAdapter(sugAdapter);
+                sugAdapter.notifyDataSetChanged();
+            }
+        });
+        et_st_navi.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line));
+        et_st_navi.setThreshold(1);
+        et_st_navi.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.length() <= 0) {
+                    return;
+                }
+
+                /**
+                 * 使用建议搜索服务获取建议列表，结果在onSuggestionResult()中更新
+                 */
+                String currentCity = CommonUtils.getSpStr(getApplicationContext(), "currentCity", "");
+                mSuggestionSearch
+                        .requestSuggestion((new SuggestionSearchOption())
+                                .keyword(charSequence.toString()).city(currentCity));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        et_en_navi.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line));
+        et_en_navi.setThreshold(1);
+        et_en_navi.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.length() <= 0) {
+                    return;
+                }
+
+                /**
+                 * 使用建议搜索服务获取建议列表，结果在onSuggestionResult()中更新
+                 */
+                String currentCity = CommonUtils.getSpStr(getApplicationContext(), "currentCity", "");
+                mSuggestionSearch
+                        .requestSuggestion((new SuggestionSearchOption())
+                                .keyword(charSequence.toString()).city(currentCity));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
         if (initDirs()) {

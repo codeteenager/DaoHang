@@ -122,7 +122,17 @@
         <activity android:name=".activity.PanoCoordinateActivity" />
         <activity android:name=".activity.PoiSearchActivity" />
         <activity android:name=".activity.IndoorActivity" />
-        <activity android:name=".activity.SelectIndoorActivity"></activity>
+        <activity android:name=".activity.SelectIndoorActivity" />
+
+        <receiver
+            android:name=".receiver.NetworkReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"></action>
+                <action android:name="android.intent.action.isNetworkConnected"></action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -18,6 +18,8 @@ import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.shuaijie.jiang.daohang.R;
 import com.shuaijie.jiang.daohang.adapter.CityAdapter;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +55,8 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 TextView cityId = (TextView) view.findViewById(R.id.city_list_id);
-                start(cityId.getText().toString());
+                TextView cityName = (TextView) view.findViewById(R.id.city_list_name);
+                start(cityId.getText().toString(), cityName.getText().toString());
             }
         });
         return view;
@@ -63,11 +66,14 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
      * 开始下载
      *
      * @param cityId
+     * @param cityName
      */
-    public void start(String cityId) {
+    public void start(String cityId, String cityName) {
         int cityid = Integer.parseInt(cityId);
         mOffline.start(cityid);
-        Toast.makeText(getActivity(), "开始下载离线地图. cityid: " + cityid, Toast.LENGTH_SHORT)
+        initCityList();
+        cityAdapter.notifyDataSetChanged();
+        Toast.makeText(getActivity(), "开始下载离线地图: " + cityName, Toast.LENGTH_SHORT)
                 .show();
     }
 
@@ -95,6 +101,12 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
                 }
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     /**

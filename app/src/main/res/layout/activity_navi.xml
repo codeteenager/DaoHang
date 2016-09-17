@@ -16,7 +16,7 @@
             android:text="起点"
             android:textSize="20sp" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/et_st_navi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,12 +36,11 @@
             android:text="终点"
             android:textSize="20sp" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/et_en_navi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp" />
-
     </LinearLayout>
 
     <Button
@@ -51,5 +50,5 @@
         android:layout_margin="10dp"
         android:background="@drawable/btn_bg"
         android:text="开始导航"
-        android:textColor="@color/white" />
+        android:textColor="@drawable/btn_text_bg" />
 </LinearLayout>

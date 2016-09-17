@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.mapapi.map.offline.MKOLUpdateElement;
 import com.baidu.mapapi.map.offline.MKOfflineMap;
@@ -129,7 +128,6 @@ public class LocalCityFragment extends Fragment implements MKOfflineMapListener 
             } else {
                 update.setText("最新");
             }
-
             remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View arg0) {
