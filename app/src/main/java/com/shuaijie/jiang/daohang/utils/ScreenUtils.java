@@ -47,7 +47,7 @@ public class ScreenUtils {
      * 将px值转换为sp值，保证文字大小不变
      *
      * @param pxValue
-     * @param fontScale（DisplayMetrics类中属性scaledDensity）
+     * @param context（DisplayMetrics类中属性scaledDensity）
      * @return
      */
     public static int px2sp(float pxValue, Context context) {
@@ -58,7 +58,7 @@ public class ScreenUtils {
      * 将sp值转换为px值，保证文字大小不变
      *
      * @param spValue
-     * @param fontScale（DisplayMetrics类中属性scaledDensity）
+     * @param context（DisplayMetrics类中属性scaledDensity）
      * @return
      */
     public static int sp2px(float spValue, Context context) {

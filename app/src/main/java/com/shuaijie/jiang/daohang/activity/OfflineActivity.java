@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class OfflineActivity extends BaseActivity {
     private TabLayout tabLayout;
-    private ViewPager vp;
+    public ViewPager vp;
     private CityListFragment cityListFragment;
     private LocalCityFragment localCityFragment;
 
@@ -68,6 +68,7 @@ public class OfflineActivity extends BaseActivity {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
+                    vp.setCurrentItem(0);
                     cityListFragment.search(query);
                     return true;
                 }

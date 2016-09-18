@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -102,10 +103,18 @@ public class NaviActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 if (CommonUtils.isNetwork(getApplicationContext())) {
-                    geoCoderSt.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_st_navi.getText().toString().trim()));
+                    if (TextUtils.isEmpty(et_en_navi.getText().toString().trim())) {
+                        Toast.makeText(NaviActivity.this, "终点不能为空", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(et_st_navi.getText().toString().trim())) {
+                        stLatlng = null;
+                        geoCoderEn.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_en_navi.getText().toString().trim()));
+                    } else {
+                        geoCoderSt.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_st_navi.getText().toString().trim()));
+                    }
                 } else {
                     Toast.makeText(NaviActivity.this, "当前无网络", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
         // 初始化建议搜索模块，注册建议搜索事件监听
@@ -199,7 +208,6 @@ public class NaviActivity extends BaseActivity {
         } else {
             sNode = new BNRoutePlanNode(stLatlng.longitude, stLatlng.latitude, null, null, coType);
         }
-
         eNode = new BNRoutePlanNode(enLatlng.longitude, enLatlng.latitude, null, null, coType);
         if (sNode != null && eNode != null) {
             List<BNRoutePlanNode> list = new ArrayList<BNRoutePlanNode>();

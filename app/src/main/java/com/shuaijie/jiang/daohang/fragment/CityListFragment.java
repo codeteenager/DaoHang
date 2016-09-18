@@ -1,5 +1,6 @@
 package com.shuaijie.jiang.daohang.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import com.baidu.mapapi.map.offline.MKOLUpdateElement;
 import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.shuaijie.jiang.daohang.R;
+import com.shuaijie.jiang.daohang.activity.OfflineActivity;
 import com.shuaijie.jiang.daohang.adapter.CityAdapter;
 import com.shuaijie.jiang.daohang.utils.CommonUtils;
 
@@ -36,6 +38,7 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
     private CityAdapter cityAdapter;
     private MKOfflineMap mOffline = null;
     private ArrayList<MKOLUpdateElement> localMapList = null;
+    private OfflineActivity offlineActivity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +49,13 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
         localMapList = mOffline.getAllUpdateInfo();
         initCityList();
         cityAdapter = new CityAdapter(getActivity(), cityData);
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        offlineActivity = (OfflineActivity) context;
     }
 
     @Nullable
@@ -86,6 +96,7 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
             mOffline.start(cityid);
             initCityList();
             cityAdapter.notifyDataSetChanged();
+            offlineActivity.vp.setCurrentItem(1);
             Toast.makeText(getActivity(), "开始下载离线地图: " + cityName, Toast.LENGTH_SHORT)
                     .show();
         } else {
