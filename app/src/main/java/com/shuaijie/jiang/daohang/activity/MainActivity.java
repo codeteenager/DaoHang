@@ -307,7 +307,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            System.out.println("定位类型" + location.getLocType());
             //网络定位成功
             if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
                 latitude = location.getLatitude();
@@ -407,12 +406,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     public void sure(String[] newCityArray) {
                         //oldCityArray为传入的默认值 newCityArray为返回的结果
                         //cityItem.setTitle(newCityArray[0] + "-" + newCityArray[1] + "-" + newCityArray[2]);
-                        cityItem.setTitle(newCityArray[1] + "市");
-                        geoCoder.geocode(new GeoCodeOption().city(newCityArray[1]).address(newCityArray[2]));
-                        actionbarProvince = newCityArray[0];
-                        actionbarCity = newCityArray[1];
-                        actionbarDistrict = newCityArray[2];
-                        Toast.makeText(getApplicationContext(), "切换到" + newCityArray[0] + "省" + newCityArray[1] + "市" + newCityArray[2] + "县", Toast.LENGTH_SHORT).show();
+                        if (CommonUtils.isNetwork(getApplicationContext())) {
+                            cityItem.setTitle(newCityArray[1] + "市");
+                            geoCoder.geocode(new GeoCodeOption().city(newCityArray[1]).address(newCityArray[2]));
+                            actionbarProvince = newCityArray[0];
+                            actionbarCity = newCityArray[1];
+                            actionbarDistrict = newCityArray[2];
+                            Toast.makeText(getApplicationContext(), "切换到" + newCityArray[0] + "省" + newCityArray[1] + "市" + newCityArray[2] + "县", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "当前无网络", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                 });
                 break;
