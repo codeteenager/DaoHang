@@ -157,7 +157,7 @@ public class PoiSearchActivity extends BaseActivity implements
         MarkerOptions ooMarker = new MarkerOptions().position(center).icon(centerBitmap);
         mBaiduMap.addOverlay(ooMarker);
 
-        OverlayOptions ooCircle = new CircleOptions().fillColor(0xCCCCCC00)
+        OverlayOptions ooCircle = new CircleOptions().fillColor(R.color.colorAccent)
                 .center(center).stroke(new Stroke(5, 0xFFFF00FF))
                 .radius(radius);
         mBaiduMap.addOverlay(ooCircle);
@@ -215,7 +215,11 @@ public class PoiSearchActivity extends BaseActivity implements
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(final String query) {
-                    searchNearbyProcess(query);
+                    if (CommonUtils.isNetwork(getApplicationContext())) {
+                        searchNearbyProcess(query);
+                    } else {
+                        Toast.makeText(PoiSearchActivity.this, "当前无网络", Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
 

@@ -25,6 +25,8 @@ import java.util.ArrayList;
  */
 public class LocalCityFragment extends Fragment implements MKOfflineMapListener {
     private MKOfflineMap mOffline = null;
+    //正在下载的城市id
+    private ArrayList<Integer> ids = new ArrayList<>();
     /**
      * 已下载的离线地图信息列表
      */
@@ -112,6 +114,11 @@ public class LocalCityFragment extends Fragment implements MKOfflineMapListener 
             MKOLUpdateElement e = (MKOLUpdateElement) getItem(index);
             view = View.inflate(getActivity(),
                     R.layout.offline_localmap_list, null);
+            ids.add(e.cityID);
+            MKOLUpdateElement temp = mOffline.getUpdateInfo(e.cityID);
+            if (temp != null && temp.status == MKOLUpdateElement.SUSPENDED) {
+                mOffline.start(e.cityID);
+            }
             initViewItem(view, e);
             return view;
         }
@@ -136,5 +143,25 @@ public class LocalCityFragment extends Fragment implements MKOfflineMapListener 
                 }
             });
         }
+    }
+
+    @Override
+    public void onPause() {
+        for (Integer cityid : ids) {
+            MKOLUpdateElement temp = mOffline.getUpdateInfo(cityid);
+            if (temp != null && temp.status == MKOLUpdateElement.DOWNLOADING) {
+                mOffline.pause(cityid);
+            }
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        /**
+         * 退出时，销毁离线地图模块
+         */
+        mOffline.destroy();
+        super.onDestroy();
     }
 }

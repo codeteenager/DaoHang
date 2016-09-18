@@ -57,26 +57,30 @@ public class PanoActivity extends BaseActivity implements
      * 响应城市内搜索按钮点击事件
      */
     public void searchButtonProcess() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view = View.inflate(this, R.layout.dialog_select_indoor, null);
-        final EditText city = (EditText) view.findViewById(R.id.et_city_indorr);
-        final EditText key = (EditText) view.findViewById(R.id.et_key_indoor);
-        builder.setView(view);
-        builder.setTitle("搜索地点");
-        builder.setPositiveButton("搜索", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                mPoiSearch.searchInCity((new PoiCitySearchOption())
-                        .city(city.getText().toString()).keyword(key.getText().toString()));
-            }
-        });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        if (CommonUtils.isNetwork(getApplicationContext())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View view = View.inflate(this, R.layout.dialog_select_indoor, null);
+            final EditText city = (EditText) view.findViewById(R.id.et_city_indorr);
+            final EditText key = (EditText) view.findViewById(R.id.et_key_indoor);
+            builder.setView(view);
+            builder.setTitle("搜索地点");
+            builder.setPositiveButton("搜索", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    mPoiSearch.searchInCity((new PoiCitySearchOption())
+                            .city(city.getText().toString()).keyword(key.getText().toString()));
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-            }
-        });
-        builder.show();
+                }
+            });
+            builder.show();
+        } else {
+            Toast.makeText(PanoActivity.this, "当前无网络", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

@@ -114,15 +114,19 @@ public class RouteInfoActivity extends BaseActivity {
     }
 
     public void search(View view) {
-        String st = et_st.getText().toString().trim();
-        String en = et_en.getText().toString().trim();
-        if (TextUtils.isEmpty(en)) {
-            Toast.makeText(getApplicationContext(), "终点不能为空", Toast.LENGTH_SHORT).show();
-            return;
+        if (CommonUtils.isNetwork(getApplicationContext())) {
+            String st = et_st.getText().toString().trim();
+            String en = et_en.getText().toString().trim();
+            if (TextUtils.isEmpty(en)) {
+                Toast.makeText(getApplicationContext(), "终点不能为空", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(RouteInfoActivity.this, RoutePlanActivity.class);
+            intent.putExtra("st", st);
+            intent.putExtra("en", en);
+            startActivity(intent);
+        } else {
+            Toast.makeText(RouteInfoActivity.this, "当前无网络", Toast.LENGTH_SHORT).show();
         }
-        Intent intent = new Intent(RouteInfoActivity.this, RoutePlanActivity.class);
-        intent.putExtra("st", st);
-        intent.putExtra("en", en);
-        startActivity(intent);
     }
 }

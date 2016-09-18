@@ -101,7 +101,11 @@ public class NaviActivity extends BaseActivity {
         startNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                geoCoderSt.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_st_navi.getText().toString().trim()));
+                if (CommonUtils.isNetwork(getApplicationContext())) {
+                    geoCoderSt.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_st_navi.getText().toString().trim()));
+                } else {
+                    Toast.makeText(NaviActivity.this, "当前无网络", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         // 初始化建议搜索模块，注册建议搜索事件监听

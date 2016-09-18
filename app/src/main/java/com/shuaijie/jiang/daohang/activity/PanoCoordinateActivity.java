@@ -48,16 +48,6 @@ public class PanoCoordinateActivity extends Activity {
         // 测试高德经纬度
         input_lat.setText(39.907687 + "");
         input_lont.setText(116.397539 + "");
-        // 测试腾讯经纬度
-        // input_lat.setText(39.907741 + "");
-        // input_lont.setText(116.397577 + "");
-        // 测试Google经纬度
-        // input_lat.setText(39.907723 + "");
-        // input_lont.setText(116.397543 + "");
-        // 测试原始GPS经纬度
-        // input_lat.setText(40.040286 + "");
-        // input_lont.setText(116.30085 + "");
-
         btn.setOnClickListener(new View.OnClickListener() {
 
             @Override

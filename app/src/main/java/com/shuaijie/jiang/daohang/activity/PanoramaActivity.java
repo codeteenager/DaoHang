@@ -11,7 +11,6 @@ import com.shuaijie.jiang.daohang.R;
 
 public class PanoramaActivity extends BaseActivity {
     private PanoramaView mPanoView;
-    private static final String LTAG = "PanoDaoHang";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

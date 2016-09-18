@@ -2,6 +2,8 @@ package com.shuaijie.jiang.daohang.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 /**
  * 作者:姜帅杰
@@ -39,7 +41,15 @@ public class CommonUtils {
         return sp.getInt(key, defaultValue);
     }
 
-    public static boolean isNetwork() {
+    public static boolean isNetwork(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();
+            }
+        }
         return false;
     }
 }

@@ -17,6 +17,7 @@ import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.shuaijie.jiang.daohang.R;
 import com.shuaijie.jiang.daohang.adapter.CityAdapter;
+import com.shuaijie.jiang.daohang.utils.CommonUtils;
 
 import org.w3c.dom.Text;
 
@@ -34,6 +35,7 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
     private List<Map> cityData;
     private CityAdapter cityAdapter;
     private MKOfflineMap mOffline = null;
+    private ArrayList<MKOLUpdateElement> localMapList = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
         mOffline = new MKOfflineMap();
         mOffline.init(this);
         cityData = new ArrayList<>();
+        localMapList = mOffline.getAllUpdateInfo();
         initCityList();
         cityAdapter = new CityAdapter(getActivity(), cityData);
     }
@@ -69,12 +72,26 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
      * @param cityName
      */
     public void start(String cityId, String cityName) {
-        int cityid = Integer.parseInt(cityId);
-        mOffline.start(cityid);
-        initCityList();
-        cityAdapter.notifyDataSetChanged();
-        Toast.makeText(getActivity(), "开始下载离线地图: " + cityName, Toast.LENGTH_SHORT)
-                .show();
+        if (CommonUtils.isNetwork(getActivity())) {
+            int cityid = Integer.parseInt(cityId);
+            if (localMapList != null) {
+                for (int i = 0; i < localMapList.size(); i++) {
+                    MKOLUpdateElement e = localMapList.get(i);
+                    if (e.cityID == cityid) {
+                        Toast.makeText(getActivity(), cityName + "已被下载", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+            }
+            mOffline.start(cityid);
+            initCityList();
+            cityAdapter.notifyDataSetChanged();
+            Toast.makeText(getActivity(), "开始下载离线地图: " + cityName, Toast.LENGTH_SHORT)
+                    .show();
+        } else {
+            Toast.makeText(getActivity(), "当前无网络", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void initCityList() {
@@ -106,7 +123,15 @@ public class CityListFragment extends Fragment implements MKOfflineMapListener {
     @Override
     public void onResume() {
         super.onResume();
+    }
 
+    @Override
+    public void onDestroy() {
+        /**
+         * 退出时，销毁离线地图模块
+         */
+        mOffline.destroy();
+        super.onDestroy();
     }
 
     /**

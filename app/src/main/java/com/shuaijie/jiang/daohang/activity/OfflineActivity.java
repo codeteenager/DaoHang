@@ -45,11 +45,6 @@ public class OfflineActivity extends BaseActivity {
 
     @Override
     protected void onPause() {
-//        int cityid = Integer.parseInt(cidView.getText().toString());
-//        MKOLUpdateElement temp = mOffline.getUpdateInfo(cityid);
-//        if (temp != null && temp.status == MKOLUpdateElement.DOWNLOADING) {
-//            mOffline.pause(cityid);
-//        }
         super.onPause();
     }
 
@@ -73,7 +68,7 @@ public class OfflineActivity extends BaseActivity {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-
+                    cityListFragment.search(query);
                     return true;
                 }
 
