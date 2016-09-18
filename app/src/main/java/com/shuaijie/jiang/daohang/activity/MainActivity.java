@@ -5,14 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
-import android.media.audiofx.BassBoost;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,7 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private MenuItem cityItem;
@@ -146,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initView() {
-        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
@@ -294,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
         );//可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
         option.setCoorType("bd09ll");//可选，默认gcj02，设置返回的定位结果坐标系
-        int span = 1000;
+        int span = 2000;
         option.setScanSpan(span);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
         option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
         option.setOpenGps(true);//可选，默认false,设置是否使用gps
@@ -311,39 +307,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-//            if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
-//                Toast.makeText(MainActivity.this, "GPS定位成功", Toast.LENGTH_SHORT).show();
-//            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
-//                Toast.makeText(MainActivity.this, "网络定位成功", Toast.LENGTH_SHORT).show();
-//            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
-//                Toast.makeText(MainActivity.this, "离线定位成功", Toast.LENGTH_SHORT).show();
-//            }
-//            latitude = location.getLatitude();
-//            longitude = location.getLongitude();
-//            MyLocationData locData = new MyLocationData.Builder()
-//                    .accuracy(location.getRadius())
-//                    // 此处设置开发者获取到的方向信息，顺时针0-360
-//                    .direction(currentX).latitude(location.getLatitude())
-//                    .longitude(location.getLongitude()).build();
-//            mBaiduMap.setMyLocationData(locData);
-//            currentCity = subCityProvince(location.getCity());
-//            currentProvince = subCityProvince(location.getProvince());
-//            currentDistrict = subCityProvince(location.getDistrict());
-//            if (isFirstLocate) {
-//                actionbarCity = subCityProvince(location.getCity());
-//                actionbarProvince = subCityProvince(location.getProvince());
-//                actionbarDistrict = subCityProvince(location.getDistrict());
-//                LatLng latlng = new LatLng(latitude, longitude);
-//                MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
-//                mBaiduMap.animateMapStatus(msu);
-//                isFirstLocate = false;
-//                cityItem.setTitle(location.getCity());
-//                Toast.makeText(getApplicationContext(), "当前位置" + location.getAddrStr(), Toast.LENGTH_SHORT).show();
-//            }
-//            String currentCity = location.getCity();
-//            CommonUtils.setSpStr(getApplicationContext(), "currentCity", currentCity);
-//            CommonUtils.setSpStr(getApplicationContext(), "currentLatitude", latitude + "");
-//            CommonUtils.setSpStr(getApplicationContext(), "currentLongitude", longitude + "");
+            System.out.println("定位类型" + location.getLocType());
+            //网络定位成功
+            if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+                MyLocationData locData = new MyLocationData.Builder()
+                        .accuracy(location.getRadius())
+                        // 此处设置开发者获取到的方向信息，顺时针0-360
+                        .direction(currentX).latitude(location.getLatitude())
+                        .longitude(location.getLongitude()).build();
+                mBaiduMap.setMyLocationData(locData);
+                currentCity = subCityProvince(location.getCity());
+                currentProvince = subCityProvince(location.getProvince());
+                currentDistrict = subCityProvince(location.getDistrict());
+                if (isFirstLocate) {
+                    actionbarCity = subCityProvince(location.getCity());
+                    actionbarProvince = subCityProvince(location.getProvince());
+                    actionbarDistrict = subCityProvince(location.getDistrict());
+                    LatLng latlng = new LatLng(latitude, longitude);
+                    MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latlng);
+                    mBaiduMap.animateMapStatus(msu);
+                    isFirstLocate = false;
+                    cityItem.setTitle(location.getCity());
+                    Toast.makeText(getApplicationContext(), "当前位置" + location.getAddrStr(), Toast.LENGTH_SHORT).show();
+                }
+                String currentCity = location.getCity();
+                CommonUtils.setSpStr(getApplicationContext(), "currentCity", currentCity);
+                CommonUtils.setSpStr(getApplicationContext(), "currentLatitude", latitude + "");
+                CommonUtils.setSpStr(getApplicationContext(), "currentLongitude", longitude + "");
+            }
         }
     }
 
@@ -438,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
         //优先返回抽屉按钮事件处理
-        return drawerToggle.onOptionsItemSelected(item) | super.onOptionsItemSelected(item);
+        return drawerToggle.onOptionsItemSelected(item);
     }
 
     private String subCityProvince(String str) {
@@ -483,6 +476,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String isShow = intent.getStringExtra("msg");
             if (isShow.equals("innet")) {
                 tv_tip_network.setVisibility(View.GONE);
+                //判断地图显示
+                if (!mMapView.isShown()) {
+                    mMapView.onResume();//唤醒地图
+                }
+                //重新注册监听
+                mLocationClient.unRegisterLocationListener(myListener);
+                mLocationClient.stop();
+                mLocationClient.registerLocationListener(myListener);
+                initLocation();
+                mLocationClient.start();
             } else {
                 tv_tip_network.setVisibility(View.VISIBLE);
             }

@@ -38,4 +38,8 @@ public class CommonUtils {
         SharedPreferences sp = context.getSharedPreferences("config", Context.MODE_PRIVATE);
         return sp.getInt(key, defaultValue);
     }
+
+    public static boolean isNetwork() {
+        return false;
+    }
 }

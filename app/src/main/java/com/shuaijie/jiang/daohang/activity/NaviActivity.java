@@ -46,8 +46,8 @@ public class NaviActivity extends BaseActivity {
     private final static String authBaseArr[] =
             {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION};
     private AutoCompleteTextView et_st_navi, et_en_navi;
-    private GeoCoder geoCoder;
-    private LatLng enLatlng;
+    private GeoCoder geoCoderEn, geoCoderSt;
+    private LatLng enLatlng, stLatlng;
     private SuggestionSearch mSuggestionSearch = null;
     private List<String> suggestSt;
     private ArrayAdapter<String> sugAdapter = null;
@@ -58,8 +58,26 @@ public class NaviActivity extends BaseActivity {
         setContentView(R.layout.activity_navi);
         startNavi = (Button) findViewById(R.id.startNavi);
         actionBar.setTitle("导航信息");
-        geoCoder = GeoCoder.newInstance();
-        geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+        geoCoderSt = GeoCoder.newInstance();
+        geoCoderEn = GeoCoder.newInstance();
+        geoCoderSt.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+                    //没有检索到结果
+                    Toast.makeText(getApplicationContext(), "没有搜索到结果", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                stLatlng = result.getLocation();
+                geoCoderEn.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_en_navi.getText().toString().trim()));
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+
+            }
+        });
+        geoCoderEn.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
             @Override
             public void onGetGeoCodeResult(GeoCodeResult result) {
                 if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
@@ -69,7 +87,7 @@ public class NaviActivity extends BaseActivity {
                 }
                 enLatlng = result.getLocation();
                 if (BaiduNaviManager.isNaviInited()) {
-                    routeplanToNavi(BNRoutePlanNode.CoordinateType.BD09LL, enLatlng);
+                    routeplanToNavi(BNRoutePlanNode.CoordinateType.BD09LL, enLatlng, stLatlng);
                 }
             }
 
@@ -83,7 +101,7 @@ public class NaviActivity extends BaseActivity {
         startNavi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                geoCoder.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_en_navi.getText().toString().trim()));
+                geoCoderSt.geocode(new GeoCodeOption().city(CommonUtils.getSpStr(getApplicationContext(), "currentCity", "")).address(et_st_navi.getText().toString().trim()));
             }
         });
         // 初始化建议搜索模块，注册建议搜索事件监听
@@ -169,10 +187,15 @@ public class NaviActivity extends BaseActivity {
         }
     }
 
-    private void routeplanToNavi(BNRoutePlanNode.CoordinateType coType, LatLng enLatlng) {
+    private void routeplanToNavi(BNRoutePlanNode.CoordinateType coType, LatLng enLatlng, LatLng stLatlng) {
         BNRoutePlanNode sNode = null;
         BNRoutePlanNode eNode = null;
-        sNode = new BNRoutePlanNode(Double.parseDouble(CommonUtils.getSpStr(getApplicationContext(), "currentLongitude", "")), Double.parseDouble(CommonUtils.getSpStr(getApplicationContext(), "currentLatitude", "")), null, null, coType);
+        if (stLatlng == null) {
+            sNode = new BNRoutePlanNode(Double.parseDouble(CommonUtils.getSpStr(getApplicationContext(), "currentLongitude", "")), Double.parseDouble(CommonUtils.getSpStr(getApplicationContext(), "currentLatitude", "")), null, null, coType);
+        } else {
+            sNode = new BNRoutePlanNode(stLatlng.longitude, stLatlng.latitude, null, null, coType);
+        }
+
         eNode = new BNRoutePlanNode(enLatlng.longitude, enLatlng.latitude, null, null, coType);
         if (sNode != null && eNode != null) {
             List<BNRoutePlanNode> list = new ArrayList<BNRoutePlanNode>();
@@ -325,6 +348,6 @@ public class NaviActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        geoCoder.destroy();
+        geoCoderEn.destroy();
     }
 }
