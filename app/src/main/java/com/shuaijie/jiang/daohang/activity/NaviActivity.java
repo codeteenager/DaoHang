@@ -114,7 +114,6 @@ public class NaviActivity extends BaseActivity {
                 } else {
                     Toast.makeText(NaviActivity.this, "当前无网络", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
         // 初始化建议搜索模块，注册建议搜索事件监听

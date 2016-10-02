@@ -217,13 +217,8 @@ public class NaviGuideActivity extends Activity {
                         addCustomizedLayerItems();
                     } else if (msg.what == MSG_HIDE) {
                         BNRouteGuideManager.getInstance().showCustomizedLayer(false);
-                    } else if (msg.what == MSG_RESET_NODE) {
-                        BNRouteGuideManager.getInstance().resetEndNodeInNavi(
-                                new BNRoutePlanNode(116.21142, 40.85087, "百度大厦11", null, BNRoutePlanNode.CoordinateType.GCJ02));
                     }
                 }
-
-                ;
             };
         }
     }
