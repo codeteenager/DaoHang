@@ -81,7 +81,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="bmgNipMhAaAysstr5udOMvuGMwp9p3MH" />
+            android:value="6Q74iSqAmvjgI0sD8DpdwRbPc0LyfOeB" />
 
         <activity
             android:name=".activity.PanoramaActivity"
